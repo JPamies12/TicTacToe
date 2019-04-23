@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>UF3-NF4-AA</title>
+		<!--   API DOCUMENTATION:  http://tictactoe.emc2.cat/help   -->
+		<link rel="stylesheet" type="text/css" href="tictac.css">
+	</head>
+	<body>
+
+		<h1>Tic Tac Toe</h1>
+		<h2>Choose</h2>
+
+			<div class="buttons">
+				<button class="btn" id="btnNew">Create</button>
+				<button class="btn" id="btnLoad">Load</button>
+			</div>
+
+		<script type="text/javascript">
+
+			window.onload = function() {
+
+				document.getElementById("btnNew").addEventListener("click", crearPartida, false);
+				document.getElementById("btnLoad").addEventListener("click", carregarPartida, false);
+
+				function crearPartida(){
+
+					window.location.href= "indexMaster.html";
+				}
+
+				function carregarPartida(){
+
+					window.location.href= "indexSlave.html";
+				}
+			}
+		</script>
+	</body>
+</html>

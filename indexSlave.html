@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>UF3-NF4-AA</title>
+		<!--   API DOCUMENTATION:  http://tictactoe.emc2.cat/help   -->
+		<link rel="stylesheet" type="text/css" href="tictac.css">
+	</head>
+	<body>
+
+		<h1>Load Game</h1>
+			
+			<input type="text" id="namePlayer" placeholder="Player Name">
+			<input type="text" id="nameParty" placeholder="Party Name">
+
+			<div class="buttons">
+				<button class="btn" id="btnLoad">Load</button>
+				<!-- <button class="btn" id="btnInfo">Info</button> -->
+			</div>
+
+		<script type="text/javascript">
+
+			window.onload = function() {
+
+				document.getElementById("btnLoad").addEventListener("click", carregarPartida, false);
+				//document.getElementById("btnInfo").addEventListener("click", getInfo, false);
+
+				//FUNCIO QUE CARREGA LA PARTIDA
+				function carregarPartida(){
+
+					var nameParty= document.getElementById("nameParty").value;
+					var namePlayer= document.getElementById("namePlayer").value;
+					//var passParty= document.getElementById("passParty").value;
+					
+					//DIFERENTS FILTRES DE CONTROL D'ERRORS
+					if (namePlayer == "") { alert("Introduce your name!");
+
+					}else if(nameParty == "") { alert("Introduce party name!");
+
+					}else{
+
+						var xhttp = new XMLHttpRequest();
+
+						xhttp.onreadystatechange = function() {
+					    
+						    if (this.readyState == 4 && this.status == 200) {
+
+								var stat= JSON.parse(this.responseText)['status'];
+
+								if (stat == "OK") {
+
+									//FORCEM A QUE EL JUGADOR QUE CREA PARTIDA SIGUI 'O'
+									var playSimbol= "O";
+									
+									//GUARDA EN COOKIE EL NOM DE JUGADOR, EL ROL (QUE EN AQUEST CAS SEMPRE SERA 'O') I EL NOM DE LA PARTIDA
+									document.cookie = "Simbol= "+ playSimbol +"; expires=Thu, 31 May 2020 12:00:00 UTC";
+									document.cookie = "Party= "+ nameParty +"; expires=Thu, 31 May 2020 12:00:00 UTC";
+									document.cookie = "Player= "+ namePlayer +"; expires=Thu, 31 May 2020 12:00:00 UTC";
+
+									//REDIRIGIM AL TAULER PER COMENÇAR A JUGAR
+									window.location.href= "tictac.html";
+								}else{
+									//SI LA PARTIDA NO HA CARREGAT CORRECTAMENT
+									alert("The game does not exist!");
+								}
+						    }
+						}
+
+						xhttp.open("POST", "http://tictactoe.emc2.cat/", true);
+				        xhttp.setRequestHeader("Content-Type", "application/json");
+						xhttp.send('{"action": "infoGame",	"gameName": "'+ nameParty +'"}');
+					}
+				}
+
+				//FUNCIO PER OBTINDRE INFO DE PARTIDA (NOMES EN US QUAN ES NECESITI, ACTUALMENT NO S'UTILITZA)
+				function getInfo(){
+
+					var nameParty= document.getElementById("nameParty").value;
+					
+					var xhttp = new XMLHttpRequest();
+
+					xhttp.onreadystatechange = function() {
+				    
+					    if (this.readyState == 4 && this.status == 200) {
+					    	
+							console.log(JSON.parse(this.responseText));
+					    }
+					}
+
+					xhttp.open("POST", "http://tictactoe.emc2.cat/", true);
+			        xhttp.setRequestHeader("Content-Type", "application/json");
+					xhttp.send('{"action": "infoGame",	"gameName": "'+ nameParty +'"}');
+				}
+			}
+		</script>
+	</body>
+</html>

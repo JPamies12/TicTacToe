@@ -1,0 +1,79 @@
+
+@import 'https://fonts.googleapis.com/css?family=Share+Tech+Mono';
+*{
+	font-family: 'Share Tech Mono', monospace;
+}
+body{
+	background: #2a2a2b;
+	color: #fff;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 100vh;
+}
+h1{
+	font-size: 2.5rem;
+}
+#marcador{
+	display: flex;
+	justify-content: space-between;
+	width: 600px;
+}
+#marcador span{
+	font-size: 1.2rem;
+}
+#nParty::before{
+	font-weight: bold;
+}
+#nPlayer::before{
+	font-weight: bold;
+}
+
+#tablero{
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	width: 500px;
+	height: 500px;
+	margin: 10px;
+}
+
+#tablero .box{
+	background: silver;
+	width: 32.93%;
+	height: 32.93%;
+	margin: 1px;
+	cursor: pointer;
+	transition: all 300ms ease;
+}
+
+#tablero .box:hover{
+	background: gray;
+}
+
+#passParty{
+	margin: 10px;
+}
+
+.buttons{
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	margin-top: 10px;
+}
+
+.btn{
+	margin: 5px;
+}
+
+.column{
+	display: flex;
+	flex-direction: column;
+}
+
+.infoDades{
+	display: flex;
+	flex-wrap: nowrap;
+	font-size: 1.2rem;
+}

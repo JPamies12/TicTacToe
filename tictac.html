@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>UF3-NF4-AA</title>
+		<!--   API DOCUMENTATION:  http://tictactoe.emc2.cat/help   -->
+		<link rel="stylesheet" type="text/css" href="tictac.css">
+	</head>
+	<body>
+
+		<h1>Tic Tac Toe</h1>
+
+		<div id="marcador">
+			<div class="infoDades">
+				<span id="nParty">NameParty: &nbsp</span><div style="color: #00BFFF;"></div>
+			</div>
+			<div class="infoDades">
+				<span id="nRolPlayer">Role: &nbsp</span><div style="color: #00BFFF;"></div>
+			</div>
+			<div class="infoDades">
+				<span id="nPlayer">Player: &nbsp</span><div style="color: #00BFFF;"></div>
+			</div>
+		</div>
+		<div id="tablero">
+			<span id="A1" class="box" data-field="1"></span>
+			<span id="B1" class="box" data-field="2"></span>
+			<span id="C1" class="box" data-field="3"></span>
+			<span id="A2" class="box" data-field="4"></span>
+			<span id="B2" class="box" data-field="5"></span>
+			<span id="C2" class="box" data-field="6"></span>
+			<span id="A3" class="box" data-field="7"></span>
+			<span id="B3" class="box" data-field="8"></span>
+			<span id="C3" class="box" data-field="9"></span>
+		</div>
+		
+		<div class="buttons">
+			<!--<button class="btn" id="btnInfo">Info</button>-->
+			<button class="btn" id="btnBack">Return</button>
+		</div>
+
+		<script type="text/javascript">
+
+			//CARREGUEM IMATGES DE 'X' I 'O' I LES DIFERENTS CASELLES
+			var casella;
+			var imgX= '<img src="X.svg.png" style="width: 100%; height: 100%;">';
+			var imgO= '<img src="O.svg.png" style="width: 100%; height: 100%;">';
+			casellaA1= document.getElementById("A1");
+			casellaB1= document.getElementById("B1");
+			casellaC1= document.getElementById("C1");
+			casellaA2= document.getElementById("A2");
+			casellaB2= document.getElementById("B2");
+			casellaC2= document.getElementById("C2");
+			casellaA3= document.getElementById("A3");
+			casellaB3= document.getElementById("B3");
+			casellaC3= document.getElementById("C3");
+
+
+			window.onload = function() {
+				
+				//OBTENIM LES DADES DE LES COOKIES QUE ES TROBEN AL NAVEGADOR
+				var nameParty= getCookie("Party");
+				var namePlayer= getCookie("Player");
+				var jugador= getCookie("Simbol");
+
+				//PRINTEM LES DADES DE COOKIES ANTERIORS
+				document.getElementById("nParty").nextElementSibling.innerHTML= nameParty;
+				document.getElementById("nPlayer").nextElementSibling.innerHTML= namePlayer;
+				document.getElementById("nRolPlayer").nextElementSibling.innerHTML= jugador;
+
+				//POSEM EN ESCOLTA PER CLICK A CADA UNA DE LES CASELLES
+				casellaA1.addEventListener("click", function() { tiraCasella(casellaA1); }, false);
+				casellaB1.addEventListener("click", function() { tiraCasella(casellaB1); }, false);
+				casellaC1.addEventListener("click", function() { tiraCasella(casellaC1); }, false);
+				casellaA2.addEventListener("click", function() { tiraCasella(casellaA2); }, false);
+				casellaB2.addEventListener("click", function() { tiraCasella(casellaB2); }, false);
+				casellaC2.addEventListener("click", function() { tiraCasella(casellaC2); }, false);
+				casellaA3.addEventListener("click", function() { tiraCasella(casellaA3); }, false);
+				casellaB3.addEventListener("click", function() { tiraCasella(casellaB3); }, false);
+				casellaC3.addEventListener("click", function() { tiraCasella(casellaC3); }, false);
+				//document.getElementById("btnInfo").addEventListener("click", getInfo, false);
+				document.getElementById("btnBack").addEventListener("click", back, false);
+
+				//FEM QUE LA FUNCIO WIN I LA FUNCIO CARREGAR TAULELL ES LLENCIN CADA 0.5 I 0.6 SEGONS
+				var interval= setInterval(win, 500);
+				setInterval(carregarTaulell, 600);
+
+				//FUNCIO QUE INSERTA LA IMATGE DEL ROL DE JUGADOR A LA CASELLA TIRADA
+				function tiraCasella(casella) {
+
+					var xhttp = new XMLHttpRequest();
+
+					xhttp.onreadystatechange = function() {
+				    
+					    if (this.readyState == 4 && this.status == 200) {
+
+					    	jugadorActual= JSON.parse(this.responseText)['player'];
+					    	console.log(jugadorActual);
+
+					    	if ((jugador == jugadorActual) && (jugador == 'X')) {
+
+					    		casella.innerHTML= '<img src="X.svg.png" style="width: 100%; height: 100%;">';
+					    	}
+					    	if ((jugador == jugadorActual) && (jugador == 'O')) {
+					    		casella.innerHTML= '<img src="O.svg.png" style="width: 100%; height: 100%;">';
+					    	}
+							
+							//CRIDA A LA FUNCIO QUE EXECUTA LA TIRADA A LA API
+							tirada(jugador, casella.id);
+
+							console.log(this.responseText);
+					    }			    
+					}
+
+					xhttp.open("POST", "http://tictactoe.emc2.cat/", true);
+			        xhttp.setRequestHeader("Content-Type", "application/json");
+					xhttp.send('{"action": "infoGame",	"gameName": "'+ nameParty +'"}');
+				}
+
+				//FUNCIO QUE EXECUTADA LA TIRADA A LA CASELLA A LA API
+				function tirada (jugador, casella){
+
+					var xhttp = new XMLHttpRequest();
+
+					xhttp.open("POST", "http://tictactoe.emc2.cat/", true);
+			        xhttp.setRequestHeader("Content-Type", "application/json");
+					xhttp.send('{"action": "playGame",	"gameName": "'+ nameParty +'",	"movement": "'+ casella +'",	"player": "'+ jugador +'"}');
+				}
+
+				//FUNCIO QUE CARRREGA EL TAULELL DE JOC BUIT I SI LA PARTIDA JA EXISTEIX EL CARREGA AMB LES DADES CORRESPONENTS
+				function carregarTaulell(){
+					
+					var xhttp = new XMLHttpRequest();
+
+					xhttp.onreadystatechange = function() {
+				    
+					    if (this.readyState == 4 && this.status == 200) {
+
+							//CARREGUEM LES 'X' QUE HI HAGIN EN LA PARTIDA INTROUIDA
+					    	if(JSON.parse(this.responseText)['gameInfo']['A1'] == 'X'){ casellaA1.innerHTML= imgX; }
+					    	if(JSON.parse(this.responseText)['gameInfo']['B1'] == 'X'){ casellaB1.innerHTML= imgX; }
+					    	if(JSON.parse(this.responseText)['gameInfo']['C1'] == 'X'){ casellaC1.innerHTML= imgX; }
+					    	if(JSON.parse(this.responseText)['gameInfo']['A2'] == 'X'){ casellaA2.innerHTML= imgX; }
+					    	if(JSON.parse(this.responseText)['gameInfo']['B2'] == 'X'){ casellaB2.innerHTML= imgX; }
+					    	if(JSON.parse(this.responseText)['gameInfo']['C2'] == 'X'){ casellaC2.innerHTML= imgX; }
+					    	if(JSON.parse(this.responseText)['gameInfo']['A3'] == 'X'){ casellaA3.innerHTML= imgX; }
+					    	if(JSON.parse(this.responseText)['gameInfo']['B3'] == 'X'){ casellaB3.innerHTML= imgX; }
+					    	if(JSON.parse(this.responseText)['gameInfo']['C3'] == 'X'){ casellaC3.innerHTML= imgX; }
+
+					    	//CARREGUEM LES 'O' QUE HI HAGIN EN LA PARTIDA INTROUIDA
+					    	if(JSON.parse(this.responseText)['gameInfo']['A1'] == 'O'){ casellaA1.innerHTML= imgO; }
+					    	if(JSON.parse(this.responseText)['gameInfo']['B1'] == 'O'){ casellaB1.innerHTML= imgO; }
+					    	if(JSON.parse(this.responseText)['gameInfo']['C1'] == 'O'){ casellaC1.innerHTML= imgO; }
+					    	if(JSON.parse(this.responseText)['gameInfo']['A2'] == 'O'){ casellaA2.innerHTML= imgO; }
+					    	if(JSON.parse(this.responseText)['gameInfo']['B2'] == 'O'){ casellaB2.innerHTML= imgO; }
+					    	if(JSON.parse(this.responseText)['gameInfo']['C2'] == 'O'){ casellaC2.innerHTML= imgO; }
+					    	if(JSON.parse(this.responseText)['gameInfo']['A3'] == 'O'){ casellaA3.innerHTML= imgO; }
+					    	if(JSON.parse(this.responseText)['gameInfo']['B3'] == 'O'){ casellaB3.innerHTML= imgO; }
+					    	if(JSON.parse(this.responseText)['gameInfo']['C3'] == 'O'){ casellaC3.innerHTML= imgO; }
+					    }
+					}
+					
+					xhttp.open("POST", "http://tictactoe.emc2.cat/", true);
+			        xhttp.setRequestHeader("Content-Type", "application/json");
+					xhttp.send('{"action": "infoGame",	"gameName": "'+ nameParty +'"}');
+				}
+
+				//FUNCIO PER OBTINDRE INFO DE PARTIDA (NOMES EN US QUAN ES NECESITI, ACTUALMENT NO S'UTILITZA)
+				function getInfo(){
+					
+					var xhttp = new XMLHttpRequest();
+
+					xhttp.onreadystatechange = function() {
+				    
+					    if (this.readyState == 4 && this.status == 200) {
+					    	
+							console.log(JSON.parse(this.responseText));
+					    }			    
+					}
+					
+					xhttp.open("POST", "http://tictactoe.emc2.cat/", true);
+			        xhttp.setRequestHeader("Content-Type", "application/json");
+					xhttp.send('{"action": "infoGame",	"gameName": "'+ nameParty +'"}');
+				}
+
+				//BOTO QUE REDIRIGEIX AL INDEX
+				function back() {
+
+					window.location.href= "index.html";
+				}
+
+				//FUNCIO D'OBTENCIO DE COOKIES
+				function getCookie(cname) {
+
+					var name = cname + "=";
+					var decodedCookie = decodeURIComponent(document.cookie);
+					var ca = decodedCookie.split(';');
+					
+					for(var i = 0; i <ca.length; i++) {
+
+						var c = ca[i];
+
+						while (c.charAt(0) == ' ') { c = c.substring(1); }
+						if (c.indexOf(name) == 0) { return c.substring(name.length, c.length); }
+					}
+
+					return "";
+				}
+
+				//FUNCIO QUE COMPROVA SI EL JUGADOR GUANYA LA PARTIDA
+				function win() {
+                    
+                    if (casellaA1.hasChildNodes()) { var casellaA1img = casellaA1.firstChild.getAttribute("src").substr(0,1); }
+                    if (casellaA2.hasChildNodes()) { var casellaA2img = casellaA2.firstChild.getAttribute("src").substr(0,1); }
+                    if (casellaA3.hasChildNodes()) { var casellaA3img = casellaA3.firstChild.getAttribute("src").substr(0,1); }
+                    if (casellaB1.hasChildNodes()) { var casellaB1img = casellaB1.firstChild.getAttribute("src").substr(0,1); }
+                    if (casellaB2.hasChildNodes()) { var casellaB2img = casellaB2.firstChild.getAttribute("src").substr(0,1); }
+                    if (casellaB3.hasChildNodes()) { var casellaB3img = casellaB3.firstChild.getAttribute("src").substr(0,1); }
+                    if (casellaC1.hasChildNodes()) { var casellaC1img = casellaC1.firstChild.getAttribute("src").substr(0,1); }
+                    if (casellaC2.hasChildNodes()) { var casellaC2img = casellaC2.firstChild.getAttribute("src").substr(0,1); }
+                    if (casellaC3.hasChildNodes()) { var casellaC3img = casellaC3.firstChild.getAttribute("src").substr(0,1); }
+
+                    if (casellaA1img == casellaB1img && casellaC1img == casellaA1img && casellaA1img != undefined) {
+                        final(casellaA1img);
+
+                    } else if (casellaA1img == casellaA2img && casellaA3img == casellaA1img && casellaA1img != undefined) {
+                        final(casellaA1img);
+                        
+                    } else if (casellaA1img == casellaB2img && casellaC3img == casellaA1img && casellaA1img != undefined) {
+                        final(casellaA1img);
+                        
+                    } else if (casellaA2img == casellaB2img && casellaC2img == casellaA2img && casellaA2img != undefined) {
+                        final(casellaA2img);
+
+                    } else if (casellaA3img == casellaB2img && casellaC1img == casellaA3img && casellaA3img != undefined) {
+                        final(casellaA3img);
+
+                    } else if (casellaA3img == casellaB3img && casellaC3img == casellaA3img && casellaA3img != undefined) {
+                        final(casellaA3img);
+
+                    } else if (casellaB1img == casellaB2img && casellaB3img == casellaB1img && casellaB1img != undefined) {
+                        final(casellaB1img);
+                        
+                    } else if (casellaC1img == casellaC2img && casellaC3img == casellaC1img && casellaC1img != undefined) {
+                        final(casellaC1img);
+                    }
+                }
+
+                //FUNCIO QUE S'EXECUTA QUAN UN DELS DOS JUGADORS HA GUANYAT LA PARTIDA I MOSTRA UN ALERT AMB EL GUANYADOR
+                function final(guanyador) {
+
+                	var jugador= getCookie("Simbol");
+                	
+                	if (guanyador == jugador) {
+
+                		var namePlayer= getCookie("Player");
+                		alert("You are the winner "+ namePlayer +" !");
+                	}else{
+
+                		alert("You have lost ! :( ");
+                	}
+
+                    clearInterval(interval);
+                    window.location.href = "index.html";
+                }
+			}
+		</script>
+	</body>
+</html>
